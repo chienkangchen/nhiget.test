@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+<HEAD>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <TITLE>NHI CIE call</TITLE>
+</HEAD>
+<BODY>
+    <style>
+        #chat {
+            width: 97%;
+        }
+
+        .message {
+            font-weight: bold;
+        }
+
+        .message:before {
+            content: ' ';
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        #log {
+            overflow: auto;
+            max-height: 300px;
+            list-style: none;
+            padding: 0;
+        }
+
+        #log li {
+            border-top: 1px solid #ccc;
+            margin: 0;
+            padding: 10px 0;
+        }
+
+        body {
+            font: normal 16px/20px "Helvetica Neue", Helvetica, sans-serif;
+            background: rgb(237, 237, 236);
+            margin: 0;
+            margin-top: 40px;
+            padding: 0;
+        }
+
+        section,
+        header {
+            display: block;
+        }
+
+        #wrapper {
+            width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            border-top: 1px solid #fff;
+            padding-bottom: 16px;
+        }
+
+        h1 {
+            padding-top: 10px;
+        }
+
+        h2 {
+            font-size: 100%;
+            font-style: italic;
+        }
+
+        header,
+        article>* {
+            margin: 20px;
+        }
+
+        #status {
+            padding: 5px;
+            color: #fff;
+            background: #ccc;
+        }
+
+        #status.fail {
+            background: #c00;
+        }
+
+        #status.success {
+            background: #0c0;
+        }
+
+        #status.offline {
+            background: #c00;
+        }
+
+        #status.online {
+            background: #0c0;
+        }
+
+        #html5badge {
+            margin-left: -30px;
+            border: 0;
+        }
+
+        #html5badge img {
+            border: 0;
+        }
+    </style>
+    <form id="Form1" action="#">
+        <table>
+            <tr>
+                <td>
+                    <input type="text" id="TextBox1" name="TextBox1">
+                </td>
+                <td>
+                    <input type="button" id="Button1" value="測試" onclick="Button1_Click()">
+                    <input type="button" id="Button2" value="清除" onclick="Button2_Click()">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" id="TextBox2" name="TextBox2">
+                </td>
+                <td>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" id="TextBox3" name="TextBox3">
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" id="TextBox4" name="TextBox4">
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="text" id="TextBox5" name="TextBox5" style="width:250px;">
+                </td>
+            </tr>
+        </table>
+        <!--form action="" method="post" id="myform" name="myform"-->
+        <table border="1">
+            <tr>
+                <td>browserType</td>
+                <td id="browserType"></td>
+            </tr>
+            <tr>
+                <td>platform</td>
+                <td id="platform"></td>
+            </tr>
+            <tr>
+                <td>wsSupport</td>
+                <td id="wsSupport">
+                    <img src="img/clear.png" id="wsSupportImg" alt="" width="25" height="25" border="0">
+                </td>
+            </tr>
+
+            <tr>
+                <td>cs</td>
+                <td colspan="2">
+                    <button type="button" onclick="ws_csGetDateTime();">csGetDateTime<br />讀取讀卡機日期時間</button>
+                    <button type="button" onclick="ws_csVerifySAMDC();">csVerifySAMDC<br />(SAM與IDC認證)</button>
+                    <button type="button" onclick="ws_csGetVersion();">csGetVersion</button>
+                    <button type="button" onclick="ws_csGetVersionEx();">csGetVersionEx</button>
+                    <button type="button" onclick="ws_csGetHospID();">csGetHospID</button>
+                </td>
+            </tr>
+            <tr>
+                <td>hisGetCardStatus</td>
+                <td colspan="2">
+                    <button type="button" onclick="ws_hisGetCardStatus();">hisGetCardStatus(讀取卡片狀態)</button>
+                    <input type="text" id="CardStatTypeTextBox" name="CardStatTypeTextBox" maxlength="2" size="2"
+                        value="1">
+                    <label>(1.SAM 2.HC 3.HPC)</label>
+                </td>
+            </tr>
+            <tr>
+                <td>csGetCardNo</td>
+                <td colspan="2">
+                    <button type="button" onclick="ws_csGetCardNo();">csGetCardNo(讀取卡片號碼)</button>
+                    <input type="text" id="CardNoTypeTextBox" name="CardNoTypeTextBox" maxlength="2" size="2" value="1">
+                    <label>(1.SAM 2.HC 3.HPC)</label>
+                </td>
+            </tr>
+            <tr>
+                <td>hisGetSam0</td>
+                <td colspan="2">
+                    <button type="button" onclick="ws_hisGetSam0();">hisGetSam0</button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>NHI_OpenCom</td>
+                <td colspan="2">
+                    <button type="button" onclick="ws_NHI_OpenCom();">NHI_OpenCom</button>
+                    <input type="text" id="ComTextBox" name="ComTextBox" maxlength="2" size="2" value="">
+                    <button type="button" onclick="ws_NHI_csCloseCom();">NHI_CloseCom</button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Response</td>
+                <td>
+                    <!--
+<textarea name="displayText" id="displayText" rows="6" cols="50" style="width:68%" readonly ></textarea>
+-->
+                    <textarea name="displayText" id="displayText" rows="6" cols="50" style="display:none;width:68%"
+                        readonly></textarea>
+                    <textarea name="displayTip" id="displayTip" rows="6" cols="24" style="width:100%"
+                        readonly></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>status</td>
+                <td id="status" name="status">
+                </td>
+            </tr>
+        </table>
+        <div id="log"></div>
+    </form>
+    <script type="text/javascript" src="js/stuff.js"></script>
+    <script language="javascript" type="text/javascript">
+        var browserName;
+        var ChildWin;
+        state = document.getElementById("status");
+        var wsUri = "wss://localhost:7775/echo";
+        // 	var wsUri = "ws://localhost:7772/echo"; 
+        // 	var wsUri = "wss://iccert.nhi.gov.tw:7775/echo"; 
+        // 	var wsUri = "wss://127.0.0.1:7775/echo"; 
+
+        // Handle difference for IE.
+        if (window.addEventListener) {
+            window.addEventListener("load", browserDetect, false);
+        }
+        else if (window.attachEvent) {
+            window.attachEvent("onload", browserDetect)
+        }
+
+
+        function Button1_Click() {
+            var txt1Obj = document.getElementById("TextBox1");
+            var txt2Obj = document.getElementById("TextBox2");
+            var txt3Obj = document.getElementById("TextBox3");
+            var txt4Obj = document.getElementById("TextBox4");
+            var txt5Obj = document.getElementById("TextBox5");
+            //txt1Obj.value
+            if (txt5Obj.value.length == 0) {
+                txt5Obj.value = "step 1";
+
+            }
+            if (txt1Obj.value.length == 0) {
+                document.getElementById("ComTextBox").value = "1";
+                ws_NHI_OpenCom();
+                //				ws_GetBasic();
+            }
+            if (txt1Obj.value.length > 0 && txt2Obj.value.length == 0) {
+                txt5Obj.value = "step 2";
+                ws_csVerifySAMDC();
+                //				ws_GetVersion();
+            }
+            if (txt2Obj.value.length > 0 && txt3Obj.value.length == 0) {
+                txt5Obj.value = "step 3";
+                //				ws_GetRandom();
+            }
+            if (txt3Obj.value.length > 0 && txt4Obj.value.length == 0 && txt5Obj.value == "step 3") {
+                txt5Obj.value = "step 4";
+                //				ws_H_Sign();
+            }
+            if (txt4Obj.value.length > 0) {
+                txt5Obj.value = "step 5";
+                /* 若要送出請取消下面這一行柱柱姊 */
+                //document.getElementById("Form1").submit();
+            }
+        }
+
+        function Button2_Click() {
+            var txt1Obj = document.getElementById("TextBox1");
+            var txt2Obj = document.getElementById("TextBox2");
+            var txt3Obj = document.getElementById("TextBox3");
+            var txt4Obj = document.getElementById("TextBox4");
+            var txt5Obj = document.getElementById("TextBox5");
+            txt1Obj.value = "";
+            txt2Obj.value = "";
+            txt3Obj.value = "";
+            txt4Obj.value = "";
+            txt5Obj.value = "";
+        }
+
+
+
+        function browserDetect() {
+
+            var bwstr = getBWver().split(':');
+            if (bwstr) {
+                BrowserDetect.browser = bwstr[0];
+                BrowserDetect.version = bwstr[1];
+            }
+            document.getElementById("browserType").innerHTML = BrowserDetect.browser + ' ' + BrowserDetect.version;
+            browserName = BrowserDetect.browser;
+            //		if(browserName == "Safari"){
+            //            wsUri = "wss://iccert.nhi.gov.tw:7775/echo";  	
+            //            wsUri = "wss://127.0.0.1:7775/echo";  	
+            //        }
+            document.getElementById("platform").innerHTML = BrowserDetect.OS;
+            if (window.WebSocket) {
+                document.getElementById("wsSupportImg").src = "img/check.png"
+            }
+            else {
+                document.getElementById("wsSupportImg").src = "img/cross.png"
+            }
+            var arr = document.cookie.match(new RegExp("(^| )" + "mNHIICCService" + "=([^;]*)(;|$)"));
+            if (arr != null) {
+                var exp = new Date();
+                exp.setTime(exp.getTime() - 1);
+                var cval = unescape(arr[2]);
+                document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+            }
+
+            onLoad();
+        }
+
+        function onLoad() {
+            var now = new Date();
+            var nowDTString = now.getFullYear() + "/" + (now.getMonth() + 1) + "/" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":59";
+            var FileNameDTString = now.getFullYear() + "" + (now.getMonth() + 1) + "" + now.getDate() + "_" + now.getHours() + "" + now.getMinutes() + "" + now.getSeconds() + "_" + now.getMilliseconds() + ".TXT";
+
+
+
+            //        document.getElementById("OwnerName2").value = getUser();
+
+            //if(browserName != "Chrome"){
+            //			var name = 'popUp';
+            //			var appearence = 'dependent=yes,menubar=no,resizable=no,' +
+            //						'status=no,toolbar=no,titlebar=no,' +
+            //						'left=5,top=180,width=420px,height=300px';
+            //ChildWin=window.open("https://127.0.0.1:7777",name,appearence);
+            //            ChildWin=window.open(httpsAcceptUri,name,appearence);
+            //}
+            //var wsUri = "wss://127.0.0.1:7777/echo";  	
+            websocket = new WebSocket(wsUri);
+            websocket.onopen = function (evt) { onOpen(evt) };
+            websocket.onclose = function (evt) { onClose(evt) };
+            websocket.onmessage = function (evt) { onMessage(evt) };
+            websocket.onerror = function (evt) { onError(evt) };
+
+            if (!String.prototype.startsWith) {
+                String.prototype.startsWith = function (searchString, position) {
+                    position = position || 0;
+                    return this.indexOf(searchString, position) === position;
+                };
+            }
+        }
+
+        function onOpen(evt) {
+            state.className = "success";
+            state.innerHTML = "Connected to server";
+            var exp = new Date();
+            exp.setTime(exp.getTime() + 60000);
+            document.cookie = "mNHIICCService=" + escape("Conn") + ";expires=" + exp.toGMTString();
+            //		ws_NHI_GetCom();
+            //        ChildWin.close();
+        }
+
+        function onClose(evt) {
+            state.className = "fail";
+            state.innerHTML = "Not connected";
+            //connected.innerHTML = "0"; 
+            //ChildWin.close();
+            ws_NHI_csCloseCom();
+        }
+
+
+        //取得.....
+        function ws_csVerifySAMDC() {
+            websocket.send("csVerifySAMDC");
+            document.getElementById("displayText").value = "";
+        }
+        function ws_csUploadData() {
+            websocket.send("csUploadData?FileName=" + document.getElementById("ULDFNameTextBox").value + "&Size=" + document.getElementById("ULDSizeTextBox").value + "&Number=" + document.getElementById("ULDNumberTextBox").value);
+            document.getElementById("displayText").value = "";
+        }
+
+        function ws_csUpdateHCNoReset() {
+            websocket.send("csUpdateHCNoReset");
+            document.getElementById("displayText").value = "";
+        }
+
+        //取得.....
+        function ws_hisGetBasicData() {
+            websocket.send("hisGetBasicData");
+            document.getElementById("displayText").value = "";
+        }
+
+        function ws_hisGetRegisterBasic() {
+            websocket.send("hisGetRegisterBasic");
+            document.getElementById("displayText").value = "";
+        }
+
+
+        function ws_hisGetRegisterBasic() {
+            websocket.send("hisGetRegisterBasic");
+            document.getElementById("displayText").value = "";
+        }
+        function ws_hisGetCardStatus() {
+            websocket.send("hisGetCardStatus?CardType=" + document.getElementById("CardStatTypeTextBox").value);
+            document.getElementById("displayText").value = "";
+        }
+        function ws_csGetCardNo() {
+            websocket.send("csGetCardNo?CardType=" + document.getElementById("CardNoTypeTextBox").value);
+            document.getElementById("displayText").value = "";
+        }
+
+        function ws_csGetVersion() {
+            websocket.send("csGetVersion");
+            document.getElementById("displayText").value = "";
+        }
+        function ws_csGetVersionEx() {
+            websocket.send("csGetVersionEx");
+            document.getElementById("displayText").value = "";
+        }
+
+        function ws_csGetHospID() {
+            websocket.send("csGetHospID");
+            document.getElementById("displayText").value = "";
+        }
+        function ws_hisGetSam0() {
+            websocket.send("hisGetSam0");
+            document.getElementById("displayText").value = "";
+        }
+
+        function ws_csGetDateTime() {
+            websocket.send("csGetDateTime");
+            document.getElementById("displayText").value = "";
+        }
+
+
+        //輸入JOb ID 取得該項工作目前傳送狀態 .....
+        function ws_NHI_OpenCom() {
+            websocket.send("OpenCom?COM=" + document.getElementById("ComTextBox").value);
+            document.getElementById("displayText").value = "";
+        }
+
+        function ws_NHI_csCloseCom() {
+            websocket.send("csCloseCom");
+            document.getElementById("displayText").value = "";
+        }
+
+        function onMessage(evt) {
+            // There are two types of messages: 
+            //     1. a chat participant message itself
+            //     2. a message with a number of connected chat participants
+            // alert("msg!!"+evt.data);
+            document.getElementById("displayText").value = evt.data;
+
+            var message = evt.data;
+
+
+            if (document.getElementById("TextBox5").value == "step 1") {
+                //				document.getElementById("TextBox1").value = evt.data;
+                //                    document.getElementById("TextBox1").value=message;
+                if (message.startsWith("OpenCom")) {
+                    //                    document.getElementById("displayTip").value = message;
+                    var splA = message.split(":");
+                    //                    document.getElementById("TextBox1").value=message+","+splA[0]+","+splA[1];
+                    if (splA[1] == "OK") {
+                        var txt5Obj = document.getElementById("TextBox5");
+                        document.getElementById("TextBox1").value = "COM" + document.getElementById("ComTextBox").value + " OK!";
+                        txt5Obj.value = "step 2";
+                        ws_csVerifySAMDC();
+                    }
+
+                }
+                else if (message.startsWith("FAIL")) {
+                    var ComNum = document.getElementById("ComTextBox").value;
+                    var iNum;
+                    iNum = parseInt(ComNum, 10);
+                    if (iNum < 20) {
+                        iNum = iNum + 1;
+                        ComNum = iNum.toString();
+                        //document.getElementById("TextBox1").value=ComNum;
+                        document.getElementById("ComTextBox").value = ComNum;
+                        ws_NHI_OpenCom();
+                    }
+                    else {
+                        document.getElementById("displayTip").value = "請確認讀卡機是否接好，且驅動程式是否設定完成！"
+                    }
+                }
+
+
+            }
+            else if (document.getElementById("TextBox5").value == "step 2") {
+                if (message.startsWith("csVerifySAMDC")) {
+                    var txt5Obj = document.getElementById("TextBox5");
+                    //                    document.getElementById("displayTip").value = message;
+                    //                    document.getElementById("TextBox1").value=message+","+splA[0]+","+splA[1];
+                    document.getElementById("TextBox2").value = message;
+                    txt5Obj.value = "step 3";
+                    ws_csGetHospID();
+                }
+                else if (message == "4061") {
+                    document.getElementById("displayTip").value = "：(4061)網路不通，安全模組無法與IDC認證";
+                }
+                else {
+                    document.getElementById("displayTip").value = message;
+                }
+            }
+            else if (document.getElementById("TextBox5").value == "step 3") {
+                if (message.startsWith("csGetHospID")) {
+                    var txt5Obj = document.getElementById("TextBox5");
+                    var splA = message.split(":");
+                    var splB = splA[1].split(",");
+                    //                    document.getElementById("displayTip").value = message;
+                    //                    document.getElementById("TextBox3").value=message;
+                    document.getElementById("TextBox3").value = "HospID:" + splB[0];
+                    txt5Obj.value = "step 4";
+                    //ws_hisGetSam0();
+                    ws_hisGetRegisterBasic();
+                }
+                else {
+                    document.getElementById("displayTip").value = message;
+                }
+            }
+            else if (document.getElementById("TextBox5").value == "step 4") {
+                if (message.startsWith("hisGetSam0")) {
+                    var txt5Obj = document.getElementById("TextBox5");
+                    var splA = message.split(":");
+                    //                    document.getElementById("displayTip").value = message;
+                    //                    document.getElementById("TextBox4").value=message;
+                    document.getElementById("TextBox4").value = "SAMID:" + splA[1];
+                    txt5Obj.value = "測試完成";
+                    ws_NHI_csCloseCom();
+                }
+                if (message.startsWith("hisGetRegisterBasic")) {
+                    var txt5Obj = document.getElementById("TextBox5");
+                    var splA = message.split(":");
+                    document.getElementById("TextBox4").value = "RegisterBasic:" + splA[1];
+                    txt5Obj.value = "測試完成";
+                    ws_NHI_csCloseCom();
+
+                }
+                // else {
+                //    document.getElementById("displayTip").value =message;
+                // }			
+            }
+            else {
+            }
+
+            if (message.startsWith("hisGetBasicData")) {
+                var splA = message.split(":");
+                document.getElementById("displayTip").value = splA[0] + "基本資料:" + splA[1];
+
+            }
+            else if (message.startsWith("OpenCom")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csCloseCom")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csSetCom")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csGetCom")) {
+                var splA = message.split(":");
+                if (document.getElementById("ComTextBox").value == "") {
+                    document.getElementById("ComTextBox").value = splA[1];
+                    ws_NHI_OpenCom();
+                }
+                else {
+                    document.getElementById("displayTip").value = message;
+                }
+                //			document.getElementById("displayTip").value = "comtesxbox is   ("+document.getElementById("ComTextBox").value+")";
+            }
+            else if (message.startsWith("csGetDateTime")) {
+                var splA = message.split(":");
+                document.getElementById("displayTip").value = "讀卡機日期時間:" + splA[1];
+            }
+            else if (message.startsWith("csGetVersion")) {
+                var splA = message.split(":");
+                document.getElementById("displayTip").value = "程式版本:" + splA[1];
+            }
+            else if (message.startsWith("csGetVersionEx")) {
+                var splA = message.split(":");
+                var splB = splA.split(",");
+                document.getElementById("displayTip").value = "程式版本:" + splB[0] + "程式實體檔案路徑:" + splB[1];
+            }
+            else if (message.startsWith("csVerifySAMDC")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csUploadData")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csUpdateHCContents")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csVerifyHCPIN")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csDisableHCPIN")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("hisGetRegisterBasic")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("hisGetCumulativeData")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csInputHCPIN")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("hisGetCardStatus")) {
+                var splA = message.split(":");
+                if (document.getElementById("CardStatTypeTextBox").value == "1") {
+                    switch (splA[1]) {
+                        case "1":
+                            document.getElementById("displayTip").value = "(1)卡片狀態:安全模組尚未與IDC認證(請先執行csVerifySAMDC)";
+                            break;
+                        case "2":
+                            document.getElementById("displayTip").value = "(2)卡片狀態:安全模組與IDC認證成功2";
+                            break;
+                        case "9":
+                            document.getElementById("displayTip").value = "(9)卡片狀態:所置入非安全模組卡";
+                            break;
+                        default:
+                            document.getElementById("displayTip").value = "(" + splA[1] + ")卡片狀態:未知狀態";
+                            break;
+                    }
+                }
+                else if (document.getElementById("CardStatTypeTextBox").value == "2") {
+                    switch (splA[1]) {
+                        case "1":
+                            document.getElementById("displayTip").value = "(1)卡片狀態:尚未與SAM認證成功(請先執行csVerifySAMDC)";
+                            break;
+                        case "2":
+                            document.getElementById("displayTip").value = "(2)與SAM認證成功";
+                            break;
+                        case "3":
+                            document.getElementById("displayTip").value = "(3)與醫事卡認證成功";
+                            break;
+                        case "4":
+                            document.getElementById("displayTip").value = "(4)PIN認證成功";
+                            break;
+                        case "5":
+                            document.getElementById("displayTip").value = "(5)與DC認證成功";
+                            break;
+                        case "6":
+                            document.getElementById("displayTip").value = "(6)器官捐贈模式";
+                            break;
+                        default:
+                            document.getElementById("displayTip").value = "(" + splA[1] + ")卡片狀態:未知狀態";
+                            break;
+                    }
+                }
+                else if (document.getElementById("CardStatTypeTextBox").value == "3") {
+                    switch (splA[1]) {
+                        case "1":
+                            document.getElementById("displayTip").value = "(1)醫事人員卡尚未與安全模組認證";
+                            break;
+                        case "2":
+                            document.getElementById("displayTip").value = "(2)醫事人員卡與安全模組認證成功(PIN尚未認證)";
+                            break;
+                        case "3":
+                            document.getElementById("displayTip").value = "(3)醫事人員卡PIN認證成功";
+                            break;
+                        case "9":
+                            document.getElementById("displayTip").value = "(9)所置入非醫事人員卡";
+                            break;
+                        default:
+                            document.getElementById("displayTip").value = "(" + splA[1] + ")卡片狀態:未知狀態";
+                            break;
+                    }
+                }
+                else
+                    document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csGetCardNo")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csGetVersion")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csGetVersionEx")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csGetHospID")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("hisGetSam0")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("hisGetCriticalIllness")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("csGetDateTime")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("HCA_GNFuncCall")) {
+                document.getElementById("displayTip").value = message;
+            }
+            else if (message.startsWith("40")) {
+                /*
+                    4000：讀卡機timeout 
+                    4013：未置入健保IC卡 
+                    4014：未置入醫事人員卡 
+                    4029：IC卡權限不足 
+                    4033：所置入非健保IC卡 
+                    4034：所置入非醫事人員卡 
+                    4042：醫事人員卡PIN尚未認證成功 
+                    4050：安全模組尚未與IDC認證 
+                */
+                switch (message) {
+                    case "4000":
+                        document.getElementById("displayText").value = "：(4000)讀卡機timeout(可能尚未OpenCom或者Com Port設定錯誤)";
+                        break;
+                    case "4013":
+                        document.getElementById("displayText").value = "：(4013)未置入健保IC卡";
+                        break;
+                    case "4014":
+                        document.getElementById("displayText").value = "：(4014)未置入醫事人員卡";
+                        break;
+                    case "4029":
+                        document.getElementById("displayText").value = "：(4029)IC卡權限不足";
+                        break;
+                    case "4033":
+                        document.getElementById("displayText").value = "：(4033)所置入非健保IC卡";
+                        break;
+                    case "4034":
+                        document.getElementById("displayText").value = "：(4034)所置入非醫事人員卡";
+                        break;
+                    case "4042":
+                        document.getElementById("displayText").value = "：(4042)醫事人員卡PIN尚未認證成功";
+                        break;
+                    case "4050":
+                        document.getElementById("displayText").value = "：(4050)安全模組尚未與IDC認證(請先執行csVerifySAMDC)";
+                        break;
+                    case "4061":
+                        document.getElementById("displayText").value = "：(4061)網路不通，安全模組無法與IDC認證";
+                        break;
+                    default:
+                        document.getElementById("displayText").value = message;
+                }
+                document.getElementById("displayTip").value = "";
+            }
+            else if (message.startsWith("50") || message.startsWith("51")) {
+                /*
+                    5015：HC卡「門診處方箋」讀取失敗。
+                    5016：HC卡「長期處方箋」讀取失敗。 
+                    5017：HC卡「重要醫令」讀取失敗。 
+                    5018：HC卡「過敏藥物」讀取失敗。 
+                    5102：使用者所輸入之pin 值，與卡上之pin值不合 
+                    5109：密碼輸入過程按『取消』鍵 
+        
+                */
+                switch (message) {
+                    case "5002":
+                        document.getElementById("displayText").value = "：(5002)註銷卡。";
+                        break;
+                    case "5002":
+                        document.getElementById("displayText").value = "：卡片過期。";
+                        break;
+                    case "5006":
+                        document.getElementById("displayText").value = "：(5006)讀取失敗。";
+                        break;
+                    case "5015":
+                        document.getElementById("displayText").value = "：(5015)HC卡「門診處方箋」讀取失敗。";
+                        break;
+                    case "5016":
+                        document.getElementById("displayText").value = "：(5016)HC卡「長期處方箋」讀取失敗。";
+                        break;
+                    case "5017":
+                        document.getElementById("displayText").value = "：(5017)HC卡「重要醫令」讀取失敗。";
+                        break;
+                    case "5018":
+                        document.getElementById("displayText").value = "：(5018)HC卡「過敏藥物」讀取失敗。";
+                        break;
+                    case "5056":
+                        document.getElementById("displayText").value = "：(5056)讀取醫事人員 ID 失敗。";
+                        break;
+                    case "5102":
+                        document.getElementById("displayText").value = "：(5102)使用者所輸入之pin 值，與卡上之pin值不合 ";
+                        break;
+                    case "5105":
+                        document.getElementById("displayText").value = "：(5105)原 PIN 碼尚未通過認證 ";
+                        break;
+                    case "5107":
+                        document.getElementById("displayText").value = "：(5107)使用者輸入兩次新 PIN 值，兩次 PIN 值不合 ";
+                        break;
+                    case "5108":
+                        document.getElementById("displayText").value = "：(5108)密碼變更失敗 ";
+                        break;
+                    case "5109":
+                        document.getElementById("displayText").value = "：(5109)密碼輸入過程按『取消』鍵 ";
+                        break;
+                    case "5110":
+                        document.getElementById("displayText").value = "：(5110)HPC-doctor treatment mode(已進入醫療模式) ";
+                        break;
+                    case "5122":
+                        document.getElementById("displayText").value = "：(5122)被鎖住的醫事人員卡仍未解開 ";
+                        break;
+                    default:
+                        document.getElementById("displayText").value = message;
+                        break;
+                }
+                //document.getElementById("displayTip").value = "";
+            }
+            else if (message.startsWith("60") || message.startsWith("61")) {
+                switch (message) {
+                    case "6018":
+                        document.getElementById("displayText").value = "：(6018)參數錯誤，讀取 HPC 卡錯誤。";
+                        break;
+                    default:
+                        document.getElementById("displayText").value = message;
+                        break;
+                }
+                //document.getElementById("displayText").value = "：未置入醫事人員卡";
+            }
+            else if (message.startsWith("90") || message.startsWith("91")) {
+                switch (message) {
+                    case "9081":
+                        document.getElementById("displayText").value = "：(9081)卡片可用次數大於3次， 未達可更新標準。";
+                        break;
+                    case "9130":
+                        document.getElementById("displayText").value = "：(9130)醫事人員卡已失效。";
+                        break;
+                    case "9140":
+                        document.getElementById("displayText").value = "：(9140)醫事人員卡已逾有效期限。";
+                        break;
+                    default:
+                        document.getElementById("displayText").value = message;
+                        break;
+                }
+                //document.getElementById("displayText").value = "：未置入醫事人員卡";
+            }
+            else {
+                document.getElementById("displayTip").value = "";
+            }
+            /*
+            if (message.startsWith("log:"))
+            {
+                message = message.slice("log:".length);
+                log.innerHTML = '<li class="message">' + message + "</li>" + log.innerHTML;	
+            }
+            else if (message.startsWith("connected:"))
+            {
+                message = message.slice("connected:".length);
+                connected.innerHTML = message;	
+            } 
+            */
+        }
+
+        function onError(evt) {
+            state.className = "fail";
+            state.innerHTML = "Communication error";
+            document.getElementById("displayText").value = evt.data;
+            websocket = new WebSocket(wsUri);
+            websocket.onopen = function (evt) { onOpen(evt) };
+            websocket.onclose = function (evt) { onClose(evt) };
+            websocket.onmessage = function (evt) { onMessage(evt) };
+            websocket.onerror = function (evt) { onError(evt) };
+        }
+
+        function addMessage() {
+            var message = chat.value;
+
+            chat.value = "";
+
+            websocket.send(message);
+        }
+
+        function getBWver() {
+            var Sys = {};
+            var ua = navigator.userAgent.toLowerCase();
+            var s;
+            //        alert(ua);
+            (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? Sys.ie = s[1] :
+                (s = ua.match(/edge\/([\d.]+)/)) ? Sys.ie = s[1] :
+                    (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+                        (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+                            (s = ua.match(/opr\/([\d.]+)/)) ? Sys.opera = s[1] :
+                                (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+                                    //       (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+                                    (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+
+            if (Sys.ie) return 'MSIE:' + Sys.ie;     //document.write('IE: ' + Sys.ie);
+            if (Sys.firefox) return 'Firefox:' + Sys.firefox;//document.write('Firefox: ' + Sys.firefox);
+            if (Sys.chrome) return 'Chrome:' + Sys.chrome; //document.write('Chrome: ' + Sys.chrome);
+            if (Sys.opera) return 'Opera:' + Sys.opera;  //document.write('Opera: ' + Sys.opera);
+            if (Sys.safari) return 'Safari:' + Sys.safari; //document.write('Safari: ' + Sys.safari);
+        }
+    </script>
+</BODY>
+
+</HTML>
